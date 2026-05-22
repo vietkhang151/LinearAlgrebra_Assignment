@@ -61,10 +61,10 @@ def print_matrix(name, matrix, precision=2):
     for row in matrix:
         print("  " + "  ".join(f"{val:8.2f}" if abs(val) > 1e-10 else f"{0.0:8.2f}" for val in row))
 
-# EXPERIMENT 1. SMALL SCALE VERIFICATION
-def experiment_1():
+# EXPERIMENT. SMALL SCALE VERIFICATION
+def experiment():
     print("="*3)
-    print("EXPERIMENT 1: SMALL SCALE (4x3)")
+    print("EXPERIMENT: SMALL SCALE (4x3)")
     A_small = np.array([
         [1, 2, 3],
         [-2, 1, -1],
@@ -78,10 +78,10 @@ def experiment_1():
     print_matrix("Reconstructed A (Q * R)", Q_s @ R_s)
     print_matrix("Compressed Ak (k=1)", low_rank_approximation(Q_s, R_s, 1))
 
-# EXPERIMENT 2: REAL IMAGE COMPRESSION
-def experiment_2():
+# EXPERIMENT 1: REAL IMAGE COMPRESSION
+def experiment_1():
     print("\n" + "="*50)
-    print("EXPERIMENT 2: REAL IMAGE COMPRESSION")
+    print("EXPERIMENT 1: REAL IMAGE COMPRESSION")
     print("="*50)
 
     image_path = 'B2DBy.jpg'
@@ -143,15 +143,32 @@ def experiment_2():
         print(f"{k:<5} | {error*100:<12.2f} | {saved:<15.2f}")
 
 
-# EXPERIMENT 3: LARGE-SCALE RANDOM MATRIX
-def experiment_3():
-    print("===SYNTHETIC LOW-RANK MATRIX (256x256, Rank=20)===")
+# EXPERIMENT 2: LARGE-SCALE RANDOM MATRIX
+def experiment_2():
+    print("\n" + "="*50)
+    print("===EXPERIMENT 2: SYNTHETIC LOW-RANK MATRIX (256x256, Rank=20)===")
+    print("="*50)
     np.random.seed(42)
     B = np.random.randn(256, 20)
     C = np.random.randn(20, 256)
     A_large = B @ C
 
     Q_l, R_l = householder_qr(A_large)
+
+    k_range = list(range(1, 51))
+    errors_graph = [calculate_error(A_large, low_rank_approximation(Q_l, R_l, k)) for k in k_range]
+
+    # Graph
+    plt.figure(figsize=(10, 6))
+    plt.plot(k_range, errors_graph, color='blue', marker='o', markevery=5, label=r'Error $\epsilon_k$')
+    plt.axvline(x=20, color='red', linestyle='--', label='True Rank (k=20)') 
+    plt.title('Error Graph for Synthetic Low-Rank Matrix', fontsize=14)
+    plt.xlabel('Rank k', fontsize=12)
+    plt.ylabel(r'Relative error $\epsilon_k$', fontsize=12)
+    plt.yscale('log') 
+    plt.grid(True, which='both', linestyle='--', alpha=0.5)
+    plt.legend()
+    plt.show()
 
     # Observe the area around point k=20
     k_values = [5, 10, 19, 20, 30]
@@ -171,6 +188,6 @@ def experiment_3():
 
 # MAIN EXECUTION
 if __name__ == "__main__":
+    experiment()
     experiment_1()
     experiment_2()
-    experiment_3()
