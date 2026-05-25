@@ -1,4 +1,4 @@
-# Linear Algebra Assignment: Image Compression via Householder QR Decomposition
+# Linear Algebra Assignment: Compression via Householder QR Decomposition
 
 This repository contains the implementation of the **Householder QR Decomposition** algorithm built from scratch using NumPy, with practical applications in low-rank matrix approximation and digital image compression.
 
